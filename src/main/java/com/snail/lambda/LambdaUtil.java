@@ -11,7 +11,7 @@ import java.util.stream.Stream;
  * @author: csz
  * @Title
  * @Package: com.snail.lambda
- * @Description:
+ * @Description: 带有一些基础的集合转换
  * @date: 2020/10/11
  */
 public enum LambdaUtil {
