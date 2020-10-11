@@ -1,0 +1,36 @@
+bookchart-common/HELP.md
+bookchart-app/HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+logs/
+
+bookchart-app/src/main/resources/application-test.yaml
+bookchart-app/src/main/resources/application-test.yml
+bookchart-app/src/main/resources/application-test.properties
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+
+### VS Code ###
+.vscode/
+nacos/
