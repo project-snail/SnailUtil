@@ -1,10 +1,12 @@
 package com.snail.spel;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.expression.MethodBasedEvaluationContext;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.TypedValue;
 import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -51,17 +53,15 @@ public enum SpelUtil {
      */
     public static <T> T getValue(String expression, Method method, Object[] args, Class<T> valueClass) {
         return getValue(expression, parseMethodToContext(method, args), valueClass);
-
     }
 
     /**
      * 生成一个解析器 map上下文
      *
-     * @param variableMap 当前上下文 <名称, 值>
+     * @param evaluationContext 当前上下文
      * @return 解析器
      */
-    public static SpelFunction generateSpelFunction(Map<String, Object> variableMap) {
-        EvaluationContext evaluationContext = parseVariableMapToContext(variableMap);
+    public static SpelFunction generateSpelFunction(EvaluationContext evaluationContext) {
         return new SpelFunction() {
             @Override
             public <T> T getValue(String expression, Class<T> valueClass) {
@@ -78,16 +78,29 @@ public enum SpelUtil {
      * @return 解析器
      */
     public static SpelFunction generateSpelFunction(Method method, Object[] args) {
-        return generateSpelFunction(parseMethodToVariableMap(method, args));
+        return generateSpelFunction(parseMethodToContext(method, args));
+    }
+
+    /**
+     * 生成一个解析器 map上下文
+     *
+     * @param variableMap map上下文
+     * @return 解析器
+     */
+    public static SpelFunction generateSpelFunction(Map<String, Object> variableMap) {
+        return generateSpelFunction(parseVariableMapToContext(variableMap));
     }
 
     /**
      * 将 方法入参上下文 转换成 map上下文
      *
+     * 可以直接通过方法创建了 * com.snail.spel.SpelUtil#parseMethodToContext(java.lang.reflect.Method, java.lang.Object[])
+     *
      * @param method 目标方法
      * @param args   目标方法的入参
      * @return map上下文
      */
+    @Deprecated
     private static Map<String, Object> parseMethodToVariableMap(Method method, Object[] args) {
 
         if (method == null || args == null) {
@@ -133,7 +146,7 @@ public enum SpelUtil {
      * @return
      */
     private static EvaluationContext parseMethodToContext(Method method, Object[] args) {
-        return parseVariableMapToContext(parseMethodToVariableMap(method, args));
+        return new MethodBasedEvaluationContext(TypedValue.NULL, method, args, discoverer);
     }
 
     @FunctionalInterface
