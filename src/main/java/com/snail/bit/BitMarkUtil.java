@@ -27,13 +27,12 @@ public enum BitMarkUtil {
         }
 
         int mark = 0;
-        int trueMark = 1;
 
         for (E next : enums) {
             if (next == null) {
                 continue;
             }
-            mark |= (trueMark << next.ordinal());
+            mark |= (1 << next.ordinal());
         }
 
         return mark;
