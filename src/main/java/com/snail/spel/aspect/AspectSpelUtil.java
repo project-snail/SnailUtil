@@ -39,9 +39,9 @@ public enum AspectSpelUtil {
 
         SpelUtil.SpelFunction spelFunction = generateSpelFunction(joinPoint);
 
-        Boolean condition = spelFunction.getValue(conditionExpression, Boolean.class);
+        Boolean condition = spelFunction.tryParseValue(conditionExpression, () -> Boolean.FALSE, Boolean.class);
 
-        return condition != null && condition ? spelFunction : null;
+        return condition ? spelFunction : null;
 
     }
 
