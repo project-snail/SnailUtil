@@ -12,10 +12,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 
 public enum SpelUtil {
@@ -23,6 +20,8 @@ public enum SpelUtil {
     private static ExpressionParser parser = new SpelExpressionParser();
 
     private static LocalVariableTableParameterNameDiscoverer discoverer = new LocalVariableTableParameterNameDiscoverer();
+
+    private static Map<String, Expression> expressionCacheMap = new WeakHashMap<>();
 
     /**
      * 解析el值 map上下文
@@ -34,7 +33,7 @@ public enum SpelUtil {
      * @return 值
      */
     public static <T> T getValue(String expression, EvaluationContext context, Class<T> valueClass) {
-        Expression exp = parser.parseExpression(expression);
+        Expression exp = expressionCacheMap.computeIfAbsent(expression, parser::parseExpression);
         try {
             return exp.getValue(context, valueClass);
         } catch (SpelEvaluationException e) {
@@ -94,7 +93,7 @@ public enum SpelUtil {
 
     /**
      * 将 方法入参上下文 转换成 map上下文
-     *
+     * <p>
      * 可以直接通过方法创建了 * com.snail.spel.SpelUtil#parseMethodToContext(java.lang.reflect.Method, java.lang.Object[])
      *
      * @param method 目标方法
