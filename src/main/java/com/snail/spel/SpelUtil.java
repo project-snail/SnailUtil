@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public enum SpelUtil {
@@ -171,14 +172,10 @@ public enum SpelUtil {
          * @return 值
          */
         default <T> T tryParseValue(String expression, Supplier<T> supplier, Class<T> valueClass) {
-            T value;
-            if (StringUtils.isNotBlank(expression)) {
-                value = getValue(expression, valueClass);
-                if (value != null) {
-                    return value;
-                }
-            }
-            return supplier.get();
+            return Optional.ofNullable(expression)
+                .filter(StringUtils::isNotBlank)
+                .map(ex -> getValue(ex, valueClass))
+                .orElseGet(supplier);
         }
     }
 
