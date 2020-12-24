@@ -1,6 +1,7 @@
 package com.snail.lambda;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.function.BinaryOperator;
@@ -117,9 +118,9 @@ public enum LambdaUtil {
 
 //        选择去重集的具体实现类
         if (isParallel) {
-            keySet = new ConcurrentSkipListSet<>();
+            keySet = Collections.newSetFromMap(new ConcurrentHashMap<>());
         } else {
-            keySet = sourceList == null ? new TreeSet<>() : new HashSet<>(sourceList.size());
+            keySet = new HashSet<>(sourceList.size());
         }
 
         return (target) -> {
