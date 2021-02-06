@@ -120,7 +120,7 @@ public enum LambdaUtil {
         if (isParallel) {
             keySet = Collections.newSetFromMap(new ConcurrentHashMap<>());
         } else {
-            keySet = new HashSet<>(sourceList.size());
+            keySet = sourceList == null ? new HashSet<>() : new HashSet<>(sourceList.size());
         }
 
         return (target) -> {
