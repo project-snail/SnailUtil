@@ -10,6 +10,7 @@ import org.springframework.expression.TypedValue;
 import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.util.ConcurrentReferenceHashMap;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -21,7 +22,7 @@ public enum SpelUtil {
 
     private static LocalVariableTableParameterNameDiscoverer discoverer = new LocalVariableTableParameterNameDiscoverer();
 
-    private static Map<String, Expression> expressionCacheMap = new WeakHashMap<>();
+    private static Map<String, Expression> expressionCacheMap = new ConcurrentReferenceHashMap<>();
 
     /**
      * 解析el值 map上下文
