@@ -1,6 +1,8 @@
 package com.snail.spel;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.context.expression.MethodBasedEvaluationContext;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
@@ -13,7 +15,10 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public enum SpelUtil {
@@ -23,6 +28,8 @@ public enum SpelUtil {
     private static LocalVariableTableParameterNameDiscoverer discoverer = new LocalVariableTableParameterNameDiscoverer();
 
     private static Map<String, Expression> expressionCacheMap = new ConcurrentReferenceHashMap<>();
+
+    private static BeanFactoryResolver beanFactoryResolver;
 
     /**
      * 解析el值 map上下文
@@ -63,6 +70,9 @@ public enum SpelUtil {
      * @return 解析器
      */
     public static SpelFunction generateSpelFunction(EvaluationContext evaluationContext) {
+        if (SpelUtil.beanFactoryResolver != null && evaluationContext instanceof StandardEvaluationContext) {
+            ((StandardEvaluationContext) evaluationContext).setBeanResolver(SpelUtil.beanFactoryResolver);
+        }
         return new SpelFunction() {
             @Override
             public <T> T getValue(String expression, Class<T> valueClass) {
@@ -129,7 +139,7 @@ public enum SpelUtil {
      * @param variableMap map上下文
      * @return
      */
-    private static EvaluationContext parseVariableMapToContext(Map<String, Object> variableMap) {
+    private static StandardEvaluationContext parseVariableMapToContext(Map<String, Object> variableMap) {
         StandardEvaluationContext context = new StandardEvaluationContext();
         if (variableMap != null) {
             for (Map.Entry<String, Object> entry : variableMap.entrySet()) {
@@ -146,8 +156,20 @@ public enum SpelUtil {
      * @param args   入参
      * @return
      */
-    private static EvaluationContext parseMethodToContext(Method method, Object[] args) {
+    private static StandardEvaluationContext parseMethodToContext(Method method, Object[] args) {
         return new MethodBasedEvaluationContext(TypedValue.NULL, method, args, discoverer);
+    }
+
+    /**
+     * 注册beanFactory 使得支持bean引用
+     *
+     * @param beanFactory beanFactory
+     */
+    public static void registerBeanFactory(BeanFactory beanFactory) {
+        if (SpelUtil.beanFactoryResolver != null) {
+            throw new RuntimeException("beanFactory已注册");
+        }
+        SpelUtil.beanFactoryResolver = new BeanFactoryResolver(beanFactory);
     }
 
     @FunctionalInterface
