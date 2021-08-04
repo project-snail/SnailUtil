@@ -61,6 +61,22 @@ public enum LambdaUtil {
         return toList(sourceList, mapFun, false);
     }
 
+    public static <R, M, T> List<T> toList(List<R> sourceList,  Function<R, M> mapFun, Function<List<M>, List<T>> convertFun) {
+
+        if (sourceList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<M> mediumList = toList(sourceList, mapFun);
+
+        if (mediumList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return convertFun.apply(mediumList);
+
+    }
+
     /**
      * 列表转map
      *
@@ -79,6 +95,17 @@ public enum LambdaUtil {
         return sourceList.stream()
             .collect(Collectors.toMap(keyFun, Function.identity(), replaceMergeFunction()));
 
+    }
+
+    public static <R, T, K> Map<K, T> toMap(List<R> sourceList, Function<List<R>, List<T>> targetListFun, Function<T, K> keyFun) {
+
+        if (sourceList.isEmpty()) {
+            return new HashMap<>();
+        }
+
+        List<T> targetList = targetListFun.apply(sourceList);
+
+        return toMap(targetList, keyFun);
 
     }
 
